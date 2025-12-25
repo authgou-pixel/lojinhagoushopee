@@ -90,6 +90,9 @@ export default function Checkout() {
         body: JSON.stringify({
           ...formData,
           description: `Pedido na Aura Boutique - ${items.length} itens`,
+          items: items, // Pass items to API
+          user_id: user?.id, // Pass user ID to API
+          shipping_info: shippingData, // Pass shipping info to API
           notification_url: window.location.origin + '/api/webhooks/mercadopago',
           payer: {
             email: shippingData?.email,

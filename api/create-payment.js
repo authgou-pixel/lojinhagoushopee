@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 
@@ -56,6 +57,50 @@ export default async function handler(req, res) {
         notification_url: body.notification_url,
       }
     });
+
+    // Create Order in Supabase if payment is successful (or pending)
+    if (response && response.id) {
+        const { data: orderData, error: orderError } = await supabaseAdmin
+            .from('orders')
+            .insert({
+                user_id: body.user_id || null,
+                status: 'pending',
+                total: body.transaction_amount,
+                payment_method: body.payment_method_id,
+                payment_status: response.status,
+                mercado_pago_payment_id: response.id.toString(),
+                shipping_address: body.shipping_info ? `${body.shipping_info.address}, ${body.shipping_info.number} - ${body.shipping_info.neighborhood}` : null,
+                shipping_city: body.shipping_info?.city,
+                shipping_state: body.shipping_info?.state,
+                shipping_zip: body.shipping_info?.zipCode,
+                customer_name: body.shipping_info?.fullName,
+                customer_email: body.payer.email,
+                customer_phone: body.shipping_info?.phone
+            })
+            .select()
+            .single();
+
+        if (orderError) {
+            console.error('Error creating order in Supabase:', orderError);
+        } else if (orderData && body.items && body.items.length > 0) {
+            // Create Order Items
+            const orderItems = body.items.map(item => ({
+                order_id: orderData.id,
+                product_id: item.id,
+                product_name: item.name,
+                product_price: item.price,
+                quantity: item.quantity
+            }));
+
+            const { error: itemsError } = await supabaseAdmin
+                .from('order_items')
+                .insert(orderItems);
+            
+            if (itemsError) {
+                 console.error('Error creating order items in Supabase:', itemsError);
+            }
+        }
+    }
 
     res.status(200).json(response);
   } catch (error) {
