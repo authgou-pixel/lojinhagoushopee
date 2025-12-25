@@ -7,7 +7,7 @@ import { User, Package, LogOut, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Account() {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,7 +74,15 @@ export default function Account() {
                     Meus Pedidos
                   </Link>
                 </Button>
-                {/* Add more account links here if needed */}
+                
+                {isAdmin && (
+                  <Button variant="default" className="w-full justify-start gap-2 bg-primary text-primary-foreground" asChild>
+                    <Link to="/admin">
+                      <Settings className="h-4 w-4" />
+                      Painel Administrativo
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
 
