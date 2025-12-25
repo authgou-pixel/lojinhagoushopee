@@ -24,6 +24,7 @@ function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Package, label: 'Produtos', path: '/admin/produtos' },
+    { icon: Settings, label: 'Configurações', path: '/admin/settings' },
   ];
 
   const handleSignOut = async () => {

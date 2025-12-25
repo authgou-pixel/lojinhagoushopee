@@ -21,6 +21,7 @@ import { AdminRoute } from "@/components/admin/AdminRoute";
 import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/products/ProductList";
 import ProductForm from "./pages/admin/products/ProductForm";
+import Settings from "./pages/admin/Settings";
 
 import ProductDetails from "./pages/ProductDetails";
 
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/produtos" element={<Products />} />
               <Route path="/produto/:slug" element={<ProductDetails />} />
               <Route path="/carrinho" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/minha-conta" element={<Account />} />
               <Route path="/meus-pedidos" element={<Orders />} />
               
@@ -51,6 +53,7 @@ const App = () => (
                 <Route path="produtos" element={<ProductList />} />
                 <Route path="produtos/novo" element={<ProductForm />} />
                 <Route path="produtos/:id" element={<ProductForm />} />
+                <Route path="settings" element={<Settings />} />
               </Route>
 
               {/* Catch all */}
