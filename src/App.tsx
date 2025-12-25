@@ -12,6 +12,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
+import Account from "./pages/Account";
+import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 
 // Admin
@@ -37,6 +39,8 @@ const App = () => (
               <Route path="/cadastro" element={<Register />} />
               <Route path="/produtos" element={<Products />} />
               <Route path="/carrinho" element={<Cart />} />
+              <Route path="/minha-conta" element={<Account />} />
+              <Route path="/meus-pedidos" element={<Orders />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminRoute />}>
