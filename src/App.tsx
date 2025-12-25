@@ -22,6 +22,8 @@ import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/products/ProductList";
 import ProductForm from "./pages/admin/products/ProductForm";
 
+import ProductDetails from "./pages/ProductDetails";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -38,6 +40,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Register />} />
               <Route path="/produtos" element={<Products />} />
+              <Route path="/produto/:slug" element={<ProductDetails />} />
               <Route path="/carrinho" element={<Cart />} />
               <Route path="/minha-conta" element={<Account />} />
               <Route path="/meus-pedidos" element={<Orders />} />

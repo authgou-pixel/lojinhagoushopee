@@ -3,6 +3,7 @@ import { ShoppingBag, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface ProductCardProps {
   product: {
@@ -20,6 +21,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem } = useCart();
+  const [imageError, setImageError] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,11 +46,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="relative aspect-square rounded-2xl bg-muted/50 overflow-hidden mb-4 shadow-soft group-hover:shadow-medium transition-all duration-300">
-        {product.image_url ? (
+        {product.image_url && !imageError ? (
           <img
             src={product.image_url}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
