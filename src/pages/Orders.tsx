@@ -100,12 +100,14 @@ export default function Orders() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-lg">Pedido #{order.id.slice(0, 8)}</span>
                         <span className={`text-xs px-2 py-1 rounded-full ${
+                          order.payment_status === 'approved' ? 'bg-green-100 text-green-700' :
                           order.status === 'completed' ? 'bg-green-100 text-green-700' :
                           order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                           'bg-yellow-100 text-yellow-700'
                         }`}>
-                          {order.status === 'completed' ? 'Concluído' :
-                           order.status === 'cancelled' ? 'Cancelado' : 'Em Processamento'}
+                          {order.payment_status === 'approved' ? 'Aprovado' :
+                           order.status === 'completed' ? 'Concluído' :
+                           order.status === 'cancelled' ? 'Cancelado' : 'Pendente'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">

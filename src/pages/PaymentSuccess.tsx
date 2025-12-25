@@ -19,6 +19,27 @@ export default function PaymentSuccess() {
       return;
     }
 
+    // Polling fallback
+    const intervalId = setInterval(async () => {
+        if (currentStatus === 'approved') {
+            clearInterval(intervalId);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('orders')
+            .select('payment_status')
+            .eq('mercado_pago_payment_id', payment.id.toString())
+            .single();
+
+        if (data && data.payment_status && data.payment_status !== currentStatus) {
+            setCurrentStatus(data.payment_status);
+            if (data.payment_status === 'approved') {
+                toast.success('Pagamento aprovado!');
+            }
+        }
+    }, 5000); // Check every 5 seconds
+
     // Subscribe to realtime updates for this order
     const channel = supabase
       .channel('order-updates')
@@ -44,6 +65,7 @@ export default function PaymentSuccess() {
 
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(intervalId);
     };
   }, [payment, navigate]);
 
