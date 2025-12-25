@@ -116,9 +116,11 @@ export default function Checkout() {
         throw new Error(errorData.error || 'Erro ao processar pagamento');
       }
 
+      const paymentResult = await response.json();
+
       toast.success('Pagamento processado com sucesso!');
       clearCart();
-      navigate('/meus-pedidos');
+      navigate('/pagamento-sucesso', { state: { payment: paymentResult } });
       
     } catch (error: any) {
       console.error('Erro ao processar pagamento:', error);
