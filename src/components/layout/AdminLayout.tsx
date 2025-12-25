@@ -6,7 +6,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
