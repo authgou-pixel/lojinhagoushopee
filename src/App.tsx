@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Account from "./pages/Account";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
