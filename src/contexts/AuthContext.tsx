@@ -25,16 +25,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error checking admin role:', error);
         return false;
       }
 
-      return !!data;
+      return data?.some(r => r.role === 'admin') ?? false;
     } catch (error) {
       console.error('Error checking admin role:', error);
       return false;
@@ -42,11 +40,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminRole(session.user.id).then(setIsAdmin);
+        const adminStatus = await checkAdminRole(session.user.id);
+        setIsAdmin(adminStatus);
       }
       setLoading(false);
     });
