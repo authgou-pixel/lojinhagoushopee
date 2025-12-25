@@ -23,7 +23,8 @@ export default function Login() {
     const { error } = await signIn(email, password);
 
     if (error) {
-      toast.error('Erro ao fazer login. Verifique suas credenciais.');
+      console.error(error);
+      toast.error(error.message || 'Erro ao fazer login. Verifique suas credenciais.');
     } else {
       toast.success('Login realizado com sucesso!');
       navigate('/');

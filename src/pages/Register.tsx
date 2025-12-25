@@ -36,9 +36,10 @@ export default function Register() {
     const { error } = await signUp(email, password, fullName);
 
     if (error) {
-      toast.error('Erro ao criar conta. Tente novamente.');
+      console.error(error);
+      toast.error(error.message || 'Erro ao criar conta. Tente novamente.');
     } else {
-      toast.success('Conta criada com sucesso!');
+      toast.success('Conta criada com sucesso! Verifique seu email se necessário.');
       navigate('/');
     }
 
