@@ -99,7 +99,13 @@ export function Header() {
                     </>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      console.log('Logout clicado');
+                      signOut();
+                    }} 
+                    className="cursor-pointer focus:bg-destructive/10 focus:text-destructive"
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Sair
                   </DropdownMenuItem>

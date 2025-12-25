@@ -42,11 +42,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    // Timeout de segurança para garantir que o loading não fique travado
+    const loadingTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('Timeout de segurança atingido: forçando fim do carregamento');
+        setLoading(false);
+      }
+    }, 5000);
+
     // Função auxiliar para inicializar a sessão
     const initializeAuth = async () => {
       try {
         console.log('Iniciando verificação de sessão...');
-        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        // Promise.race para evitar que o getSession trave indefinidamente
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout ao buscar sessão')), 4000)
+        );
+
+        const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         
         if (error) {
           console.error('Erro ao obter sessão:', error);
@@ -59,16 +74,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           if (session?.user) {
             console.log('Usuário encontrado, verificando permissões...');
-            const adminStatus = await checkAdminRole(session.user.id);
-            if (mounted) setIsAdmin(adminStatus);
+            // Não bloqueia o loading inicial pela verificação de admin
+            checkAdminRole(session.user.id).then(adminStatus => {
+              if (mounted) setIsAdmin(adminStatus);
+            });
           }
         }
       } catch (error) {
         console.error('Erro na inicialização da autenticação:', error);
+        // Em caso de erro, assume sem usuário para destravar a interface
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+        }
       } finally {
         if (mounted) {
           console.log('Finalizando carregamento inicial...');
           setLoading(false);
+          clearTimeout(loadingTimeout);
         }
       }
     };
@@ -82,19 +105,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
-          setLoading(true); // Recarrega status ao mudar sessão
           
-          try {
-            if (session?.user) {
-              const adminStatus = await checkAdminRole(session.user.id);
+          if (event === 'SIGNED_OUT') {
+            setIsAdmin(false);
+            setLoading(false);
+            return;
+          }
+
+          if (session?.user) {
+            checkAdminRole(session.user.id).then(adminStatus => {
               if (mounted) setIsAdmin(adminStatus);
-            } else {
-              if (mounted) setIsAdmin(false);
-            }
-          } catch (error) {
-            console.error('Erro ao atualizar estado:', error);
-          } finally {
-            if (mounted) setLoading(false);
+            });
           }
         }
       }
@@ -102,40 +123,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
+      clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error: error as Error | null };
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error: error as Error | null };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
         },
-      },
-    });
-    return { error: error as Error | null };
+      });
+      return { error: error as Error | null };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut = async () => {
+    console.log('Iniciando logout...');
+    // Limpa estado local IMEDIATAMENTE para feedback instantâneo na UI
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+    
     try {
+      // Tenta logout no servidor
       await supabase.auth.signOut();
+      console.log('Logout no servidor concluído');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Erro no logout do servidor (ignorado pois estado local já foi limpo):', error);
+      // Força limpeza do localStorage se houver erro
+      localStorage.clear(); 
     } finally {
-      setUser(null);
-      setSession(null);
-      setIsAdmin(false);
       setLoading(false);
     }
   };
