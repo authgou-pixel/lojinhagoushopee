@@ -24,6 +24,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/products/ProductList";
 import ProductForm from "./pages/admin/products/ProductForm";
 import Settings from "./pages/admin/Settings";
+import OrderList from "./pages/admin/orders/OrderList";
 
 import ProductDetails from "./pages/ProductDetails";
 
