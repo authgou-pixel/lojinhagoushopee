@@ -5,36 +5,54 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+
+// Pages
 import Index from "./pages/Index";
-import Products from "./pages/Products";
-import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Products from "./pages/Products";
+import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
+
+// Admin
+import { AdminRoute } from "@/components/admin/AdminRoute";
+import Dashboard from "./pages/admin/Dashboard";
+import ProductList from "./pages/admin/products/ProductList";
+import ProductForm from "./pages/admin/products/ProductForm";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/produtos" element={<Products />} />
               <Route path="/carrinho" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/cadastro" element={<Register />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminRoute />}>
+                <Route index element={<Dashboard />} />
+                <Route path="produtos" element={<ProductList />} />
+                <Route path="produtos/novo" element={<ProductForm />} />
+                <Route path="produtos/:id" element={<ProductForm />} />
+              </Route>
+
+              {/* Catch all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </TooltipProvider>
+        </TooltipProvider>
+      </CartProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
