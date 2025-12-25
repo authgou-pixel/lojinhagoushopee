@@ -48,6 +48,7 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/minha-conta" element={<Account />} />
               <Route path="/meus-pedidos" element={<Orders />} />
+              <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminRoute />}>
