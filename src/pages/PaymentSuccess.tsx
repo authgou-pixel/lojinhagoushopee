@@ -1,20 +1,50 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Copy, ExternalLink, AlertCircle } from 'lucide-react';
+import { CheckCircle, Copy, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentSuccess() {
   const location = useLocation();
   const navigate = useNavigate();
   const payment = location.state?.payment;
+  const [currentStatus, setCurrentStatus] = useState(payment?.status || 'pending');
 
   useEffect(() => {
     if (!payment) {
       navigate('/meus-pedidos');
+      return;
     }
+
+    // Subscribe to realtime updates for this order
+    const channel = supabase
+      .channel('order-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `mercado_pago_payment_id=eq.${payment.id}`,
+        },
+        (payload) => {
+          const newStatus = payload.new.payment_status;
+          if (newStatus) {
+            setCurrentStatus(newStatus);
+            if (newStatus === 'approved') {
+                toast.success('Pagamento aprovado!');
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [payment, navigate]);
 
   if (!payment) return null;
@@ -31,25 +61,31 @@ export default function PaymentSuccess() {
     }
   };
 
+  const isApproved = currentStatus === 'approved';
+
   return (
     <Layout>
       <div className="container-elegant py-12 md:py-24">
         <div className="max-w-2xl mx-auto bg-card rounded-xl border border-border/50 shadow-soft p-8 text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isApproved ? 'bg-green-100' : 'bg-yellow-100'}`}>
+              {isApproved ? (
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+              ) : (
+                  <Loader2 className="w-8 h-8 text-yellow-600 animate-spin" />
+              )}
             </div>
           </div>
 
           <h1 className="font-display text-3xl font-semibold mb-4">
-            Pedido Realizado!
+            {isApproved ? 'Pagamento Aprovado!' : 'Aguardando Pagamento'}
           </h1>
           
           <p className="text-muted-foreground mb-8">
             Seu pedido #{payment.id} foi registrado com sucesso.
           </p>
 
-          {isPix && qrCode && (
+          {!isApproved && isPix && qrCode && (
             <div className="bg-muted/30 rounded-lg p-6 mb-8 border border-border">
               <h3 className="font-semibold mb-4">Pagamento via Pix</h3>
               
@@ -96,12 +132,14 @@ export default function PaymentSuccess() {
           )}
 
           <div className="space-y-4">
-            <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-sm flex items-start gap-3 text-left">
+            <div className={`p-4 rounded-lg text-sm flex items-start gap-3 text-left ${isApproved ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
               <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">Status do Pagamento: {translateStatus(payment.status)}</p>
+                <p className="font-medium">Status do Pagamento: {translateStatus(currentStatus)}</p>
                 <p className="mt-1 opacity-90">
-                  Você receberá uma confirmação por e-mail assim que o pagamento for aprovado.
+                    {isApproved 
+                        ? 'Seu pagamento foi confirmado. Estamos preparando seu pedido!' 
+                        : 'Assim que você realizar o pagamento, a confirmação aparecerá aqui automaticamente.'}
                 </p>
               </div>
             </div>

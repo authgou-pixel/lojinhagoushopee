@@ -121,7 +121,12 @@ export default function Checkout() {
 
       const paymentResult = await response.json();
 
-      toast.success('Pagamento processado com sucesso!');
+      if (paymentResult.status === 'approved') {
+        toast.success('Pagamento aprovado com sucesso!');
+      } else {
+        toast.success('Pedido gerado com sucesso! Finalize o pagamento.');
+      }
+      
       clearCart();
       navigate('/pagamento-sucesso', { state: { payment: paymentResult } });
       
