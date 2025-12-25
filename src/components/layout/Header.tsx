@@ -72,28 +72,42 @@ export function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-5 w-5 text-primary" />
+                    <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-green-500 border-2 border-background" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-56 z-[100]">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      {user.user_metadata?.full_name && (
+                        <p className="font-medium">{user.user_metadata.full_name}</p>
+                      )}
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/minha-conta" className="cursor-pointer">
-                      Minha Conta
+                    <Link to="/minha-conta" className="cursor-pointer w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Minha Conta</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/meus-pedidos" className="cursor-pointer">
-                      Meus Pedidos
+                    <Link to="/meus-pedidos" className="cursor-pointer w-full">
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      <span>Meus Pedidos</span>
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/admin" className="cursor-pointer flex items-center gap-2">
+                        <Link to="/admin" className="cursor-pointer flex items-center gap-2 w-full">
                           <Settings className="h-4 w-4" />
-                          Painel Admin
+                          <span>Painel Admin</span>
                         </Link>
                       </DropdownMenuItem>
                     </>
@@ -104,17 +118,18 @@ export function Header() {
                       console.log('Logout clicado');
                       signOut();
                     }} 
-                    className="cursor-pointer focus:bg-destructive/10 focus:text-destructive"
+                    className="cursor-pointer focus:bg-destructive/10 focus:text-destructive w-full"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sair
+                    <span>Sair</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link to="/login">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="sm" className="gap-2">
                   <User className="h-5 w-5" />
+                  <span className="hidden md:inline">Entrar</span>
                 </Button>
               </Link>
             )}
