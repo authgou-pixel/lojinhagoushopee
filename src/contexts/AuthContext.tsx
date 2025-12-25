@@ -40,31 +40,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        const adminStatus = await checkAdminRole(session.user.id);
-        setIsAdmin(adminStatus);
+    let mounted = true;
+
+    // Função auxiliar para inicializar a sessão
+    const initializeAuth = async () => {
+      try {
+        console.log('Iniciando verificação de sessão...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Erro ao obter sessão:', error);
+          throw error;
+        }
+
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            console.log('Usuário encontrado, verificando permissões...');
+            const adminStatus = await checkAdminRole(session.user.id);
+            if (mounted) setIsAdmin(adminStatus);
+          }
+        }
+      } catch (error) {
+        console.error('Erro na inicialização da autenticação:', error);
+      } finally {
+        if (mounted) {
+          console.log('Finalizando carregamento inicial...');
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          const adminStatus = await checkAdminRole(session.user.id);
-          setIsAdmin(adminStatus);
-        } else {
-          setIsAdmin(false);
+      async (event, session) => {
+        console.log('Mudança de estado de autenticação:', event);
+        
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(true); // Recarrega status ao mudar sessão
+          
+          try {
+            if (session?.user) {
+              const adminStatus = await checkAdminRole(session.user.id);
+              if (mounted) setIsAdmin(adminStatus);
+            } else {
+              if (mounted) setIsAdmin(false);
+            }
+          } catch (error) {
+            console.error('Erro ao atualizar estado:', error);
+          } finally {
+            if (mounted) setLoading(false);
+          }
         }
-        setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Package, LogOut, Settings } from 'lucide-react';
+import { User, Package, LogOut, Settings, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Account() {
@@ -32,8 +32,9 @@ export default function Account() {
   if (loading) {
     return (
       <Layout>
-        <div className="container-elegant py-20 text-center">
-          <p>Carregando...</p>
+        <div className="container-elegant py-32 flex flex-col items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground animate-pulse">Carregando suas informações...</p>
         </div>
       </Layout>
     );
