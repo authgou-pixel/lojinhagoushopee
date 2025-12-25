@@ -24,6 +24,7 @@ function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+    { icon: ShoppingBag, label: 'Pedidos', path: '/admin/pedidos' },
     { icon: Package, label: 'Produtos', path: '/admin/produtos' },
     { icon: Settings, label: 'Configurações', path: '/admin/settings' },
   ];
