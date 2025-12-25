@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard,
   Package,
+  Settings,
   LogOut,
   Menu,
   X
