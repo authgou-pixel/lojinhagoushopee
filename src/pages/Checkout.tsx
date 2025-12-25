@@ -82,11 +82,15 @@ export default function Checkout() {
     try {
       const { formData } = paymentData;
       
-      const { data: response, error } = await supabase.functions.invoke('create-payment', {
-        body: {
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           ...formData,
           description: `Pedido na Aura Boutique - ${items.length} itens`,
-          notification_url: 'https://your-domain.com/api/webhooks/mercadopago', // Update this
+          notification_url: window.location.origin + '/api/webhooks/mercadopago',
           payer: {
             email: shippingData?.email,
             first_name: shippingData?.fullName.split(' ')[0],
@@ -104,10 +108,13 @@ export default function Checkout() {
               federal_unit: shippingData?.state
             }
           }
-        }
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao processar pagamento');
+      }
 
       toast.success('Pagamento processado com sucesso!');
       clearCart();
