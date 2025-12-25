@@ -22,7 +22,10 @@ export default function Account() {
       toast.success('Você saiu da sua conta');
       navigate('/');
     } catch (error) {
+      console.error(error);
       toast.error('Erro ao sair da conta');
+      // Force navigation even if error
+      navigate('/');
     }
   };
 
