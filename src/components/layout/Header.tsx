@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShoppingBag, User, Menu, X, LogOut, Settings } from 'lucide-react';
+import { ShoppingBag, User, Menu, X, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+const categories = [
+  { name: 'Perfumes', slug: 'perfumes' },
+  { name: 'Hidratantes', slug: 'hidratantes' },
+  { name: 'Sabonetes', slug: 'sabonetes' },
+  { name: 'Desodorantes', slug: 'desodorantes' },
+  { name: 'Kits', slug: 'kits' },
+];
 
 export function Header() {
   const { itemCount } = useCart();
@@ -42,12 +50,31 @@ export function Header() {
             >
               Produtos
             </Link>
-            <Link
-              to="/categorias"
-              className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Categorias
-            </Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 outline-none">
+                Categorias <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48 bg-white/95 backdrop-blur-md border-border/50">
+                {categories.map((category) => (
+                  <DropdownMenuItem key={category.slug} asChild>
+                    <Link 
+                      to={`/produtos?categoria=${category.slug}`}
+                      className="cursor-pointer w-full"
+                    >
+                      {category.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/categorias" className="cursor-pointer w-full font-medium">
+                    Ver todas as categorias
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link
               to="/sobre"
               className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -164,13 +191,30 @@ export function Header() {
               >
                 Produtos
               </Link>
-              <Link
-                to="/categorias"
-                className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Categorias
-              </Link>
+              
+              <div className="space-y-3">
+                <div className="font-body text-sm font-medium text-foreground">Categorias</div>
+                <div className="pl-4 flex flex-col gap-3 border-l border-border/50 ml-1">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.slug}
+                      to={`/produtos?categoria=${category.slug}`}
+                      className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                  <Link
+                    to="/categorias"
+                    className="font-body text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Ver todas
+                  </Link>
+                </div>
+              </div>
+
               <Link
                 to="/sobre"
                 className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
