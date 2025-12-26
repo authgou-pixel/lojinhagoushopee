@@ -10,7 +10,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="inline-block mb-4">
               <span className="font-display text-3xl font-semibold text-champagne">
-                Essência
+                GouShopee
               </span>
             </Link>
             <p className="text-cream/70 font-body text-sm max-w-md leading-relaxed">
@@ -96,7 +96,7 @@ export function Footer() {
 
         <div className="border-t border-cream/10 mt-12 pt-8 text-center">
           <p className="text-cream/50 text-sm">
-            © {new Date().getFullYear()} Essência. Todos os direitos reservados.
+            © {new Date().getFullYear()} GouShopee. Todos os direitos reservados.
           </p>
         </div>
       </div>

@@ -21,8 +21,8 @@ export function Hero() {
           </div>
 
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-semibold text-cream leading-tight mb-6 animate-fade-in-up">
-            Descubra sua
-            <span className="block text-champagne">Essência</span>
+            Bem-vindo à
+            <span className="block text-champagne">GouShopee</span>
           </h1>
 
           <p className="text-cream/80 font-body text-lg md:text-xl max-w-xl mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
